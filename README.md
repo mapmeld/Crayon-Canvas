@@ -1,21 +1,21 @@
-# Sketchcart
+<a href="http://crayonmap.heroku.com">Crayon Vector</a>
+---
+Based on Crayon Canvas, an art library to make items in the HTML5 <canvas> element as if they were drawn in crayon
+Screenshot using the OpenStreetMap tool:
 
-Mix of ideas which I've had since I saw [Walkway.js](http://www.connoratherton.com/walkway)
+<img src="http://i.imgur.com/peVteJK.png"/>
 
-## How to use with a custom map
+---
 
-* Put GeoJSON data into data.geojson
-* Change app.js to center on your location
-* Refresh the page!
+Crayon Canvas (JavaScript)
+- The library to draw lines and polygons in crayon
+- drawLine, which connects two points using a crayon-like style and a given color
+- drawShape, which connects vertices with drawLine, then fills in the space with a zig-zag, crayon-like pattern
 
-## License
+<img src="http://i.imgur.com/CYQFF3N.png"/>
 
-Map data copyright 2015 OpenStreetMap and contributors, available under ODBL
+--
 
-Walkway.js is written by Connor Atherton, and is available under the MIT license
-
-D3 -> Leaflet tiling based on work by Ziggy Jonsson and Nelson Minar http://bl.ocks.org/NelsonMinar/5624141
-
-PHP Heroku code from https://github.com/heroku/php-getting-started
-
-Code for Sketchcart is also available under the MIT license
+index.php / viewer
+- Static file for Heroku to show map
+- PHP proxy to load GeoJSON layers from OpenStreetMap.us
