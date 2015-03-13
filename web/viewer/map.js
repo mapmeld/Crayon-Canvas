@@ -232,7 +232,7 @@ canvasTiles.drawTile = function(canvas, tilePoint, zoom) {
     
     var features = tileData.contents.features;
     $.each(features, function(f, feature){
-      drawShape(ctx, xyify( feature.geometry.coordinates[0] ),"#A52A2A","#A52A2A");
+      drawShape(ctx, xyify( feature.geometry.coordinates[0] ),"#C0C0C0","#C0C0C0");
     });
   });
 };
