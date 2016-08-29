@@ -21,12 +21,12 @@ map.on('moveend', function(){
     + "/" + map.getCenter().lng.toFixed(6);
 });
 
-$("#map").append($("<div>").css({ position: "fixed", background: "#ccc", opacity: 0.85, bottom: 0, right: 0 }).html("Data &copy 2013 OpenStreetMap contributors - Vector Tiles from OSM US - Crayonized by <a href='https://twitter.com/mapmeld'>@mapmeld</a>"));
+$("#map").append($("<div>").css({ position: "fixed", background: "#ccc", opacity: 0.85, bottom: 0, right: 0 }).html("Data &copy 2016 OpenStreetMap contributors - Vector Tiles from MapZen - Crayonized by <a href='https://twitter.com/mapmeld'>@mapmeld</a>"));
 
 var canvasLand = L.tileLayer.canvas();
 canvasLand.drawTile = function(canvas, tilePoint, zoom) {
   $.getJSON("/tileproxy.php?url="
-    + escape("http://tile.openstreetmap.us/vectiles-land-usages/{z}/{x}/{y}.json"
+    + escape("http://vector.mapzen.com/osm/landuse/{z}/{x}/{y}.json?api_key=vector-tiles-5Vy5RHT"
       .replace("{z}", zoom)
       .replace("{x}", tilePoint.x)
       .replace("{y}", tilePoint.y)
@@ -95,7 +95,7 @@ canvasLand.addTo(map);
 var canvasWater = L.tileLayer.canvas();
 canvasWater.drawTile = function(canvas, tilePoint, zoom) {
   $.getJSON("/tileproxy.php?url="
-    + escape("http://tile.openstreetmap.us/vectiles-water-areas/{z}/{x}/{y}.json"
+    + escape("http://vector.mapzen.com/osm/water/{z}/{x}/{y}.json?api_key=vector-tiles-5Vy5RHT"
       .replace("{z}", zoom)
       .replace("{x}", tilePoint.x)
       .replace("{y}", tilePoint.y)
@@ -138,7 +138,7 @@ canvasWater.addTo(map);
 var canvasRoads = L.tileLayer.canvas({ minZoom: 13 });
 canvasRoads.drawTile = function(canvas, tilePoint, zoom) {
   $.getJSON("/tileproxy.php?url="
-    + escape("http://tile.openstreetmap.us/vectiles-highroad/{z}/{x}/{y}.json"
+    + escape("http://vector.mapzen.com/osm/roads/{z}/{x}/{y}.json?api_key=vector-tiles-5Vy5RHT"
       .replace("{z}", zoom)
       .replace("{x}", tilePoint.x)
       .replace("{y}", tilePoint.y)
@@ -198,7 +198,7 @@ canvasRoads.addTo(map);
 var canvasTiles = L.tileLayer.canvas({ minZoom: 15 });
 canvasTiles.drawTile = function(canvas, tilePoint, zoom) {
   $.getJSON("/tileproxy.php?url="
-    + escape("http://tile.openstreetmap.us/vectiles-buildings/{z}/{x}/{y}.json"
+   + escape("http://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.json?api_key=vector-tiles-5Vy5RHT"
       .replace("{z}", zoom)
       .replace("{x}", tilePoint.x)
       .replace("{y}", tilePoint.y)
