@@ -56,6 +56,13 @@ canvasLand.drawTile = function(canvas, tilePoint, zoom) {
 
     var ctx = canvas.getContext("2d");
 
+    var layers = ['water', 'landuse', 'roads', 'buildings'];
+    for (var rr = 0; rr < layers.length; rr++) {
+      if (!tileData[layers[rr]] || !tileData[layers[rr]].features) {
+        tileData[layers[rr]] = { features: [] };
+      }
+    }
+
     $.each(tileData.water.features, function(f, feature){
       drawShape(ctx, xyify( feature.geometry.coordinates[0] ),"#00f","#33f");
     });
