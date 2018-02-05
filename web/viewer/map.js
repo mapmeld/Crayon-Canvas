@@ -25,13 +25,11 @@ $("#map").append($("<div>").css({ position: "fixed", background: "#ccc", opacity
 
 var canvasLand = L.tileLayer.canvas();
 canvasLand.drawTile = function(canvas, tilePoint, zoom) {
-  $.getJSON("/tileproxy.php?url="
-    + escape("http://vector.mapzen.com/osm/landuse/{z}/{x}/{y}.json?api_key=vector-tiles-5Vy5RHT"
+  $.getJSON("https://tile.nextzen.org/tilezen/vector/v1/256/all/{z}/{x}/{y}.json?api_key=fgUyV10ySEuZkdmyOjGWTA"
       .replace("{z}", zoom)
       .replace("{x}", tilePoint.x)
-      .replace("{y}", tilePoint.y)
-  ), function(tileData){
-    if(!tileData.contents || !tileData.contents.features || !tileData.contents.features.length){
+      .replace("{y}", tilePoint.y), function(tileData){
+    if(!tileData){
       return;
     }
 
@@ -40,7 +38,7 @@ canvasLand.drawTile = function(canvas, tilePoint, zoom) {
     var west = bounds[1];
     var north = bounds[2];
     var east = bounds[3];
-    
+
     var lltoxy = function(latlng){
 	  // convert a lat/lng to the canvas's x/y format
 	  var lat = latlng[1];
@@ -57,9 +55,12 @@ canvasLand.drawTile = function(canvas, tilePoint, zoom) {
 	};
 
     var ctx = canvas.getContext("2d");
-    
-    var features = tileData.contents.features;
-    $.each(features, function(f, feature){
+
+    $.each(tileData.water.features, function(f, feature){
+      drawShape(ctx, xyify( feature.geometry.coordinates[0] ),"#00f","#33f");
+    });
+
+    $.each(tileData.landuse.features, function(f, feature){
       // determine colorset for this line
       var colorset = [];
       var amenity = feature["properties"]["amenity"] || "";
@@ -88,90 +89,8 @@ canvasLand.drawTile = function(canvas, tilePoint, zoom) {
         drawShape(ctx, xyify( feature.geometry.coordinates[0] ),colorset[0], colorset[1]);
       }
     });
-  });
-};
-canvasLand.addTo(map);
 
-var canvasWater = L.tileLayer.canvas();
-canvasWater.drawTile = function(canvas, tilePoint, zoom) {
-  $.getJSON("/tileproxy.php?url="
-    + escape("http://vector.mapzen.com/osm/water/{z}/{x}/{y}.json?api_key=vector-tiles-5Vy5RHT"
-      .replace("{z}", zoom)
-      .replace("{x}", tilePoint.x)
-      .replace("{y}", tilePoint.y)
-  ), function(tileData){
-    if(!tileData.contents || !tileData.contents.features || !tileData.contents.features.length){
-      return;
-    }
-
-    var bounds = getTileBounds(tilePoint.x, tilePoint.y, zoom);
-    var south = bounds[0];
-    var west = bounds[1];
-    var north = bounds[2];
-    var east = bounds[3];
-    
-    var lltoxy = function(latlng){
-	  // convert a lat/lng to the canvas's x/y format
-	  var lat = latlng[1];
-	  var lng = latlng[0];
-	  return [ Math.round(256 * (lng - west) / (east - west)), Math.round(256 * (north - lat) / (north - south)) ];
-    };
-    var xyify = function(gpsline){
-	  // convert a whole array of lat/lngs to the canvas's x/y format
-	  var drawline = [];
-	  for(var pt=0;pt<gpsline.length;pt++){
-		drawline.push(lltoxy(gpsline[pt]));
-	  }
-	  return drawline;
-	};
-
-    var ctx = canvas.getContext("2d");
-    
-    var features = tileData.contents.features;
-    $.each(features, function(f, feature){
-      drawShape(ctx, xyify( feature.geometry.coordinates[0] ),"#00f","#33f");
-    });
-  });
-};
-canvasWater.addTo(map);
-
-var canvasRoads = L.tileLayer.canvas({ minZoom: 13 });
-canvasRoads.drawTile = function(canvas, tilePoint, zoom) {
-  $.getJSON("/tileproxy.php?url="
-    + escape("http://vector.mapzen.com/osm/roads/{z}/{x}/{y}.json?api_key=vector-tiles-5Vy5RHT"
-      .replace("{z}", zoom)
-      .replace("{x}", tilePoint.x)
-      .replace("{y}", tilePoint.y)
-  ), function(tileData){
-    if(!tileData.contents || !tileData.contents.features || !tileData.contents.features.length){
-      return;
-    }
-
-    var bounds = getTileBounds(tilePoint.x, tilePoint.y, zoom);
-    var south = bounds[0];
-    var west = bounds[1];
-    var north = bounds[2];
-    var east = bounds[3];
-    
-    var lltoxy = function(latlng){
-	  // convert a lat/lng to the canvas's x/y format
-	  var lat = latlng[1];
-	  var lng = latlng[0];
-	  return [ Math.round(256 * (lng - west) / (east - west)), Math.round(256 * (north - lat) / (north - south)) ];
-    };
-    var xyify = function(gpsline){
-	  // convert a whole array of lat/lngs to the canvas's x/y format
-	  var drawline = [];
-	  for(var pt=0;pt<gpsline.length;pt++){
-		drawline.push(lltoxy(gpsline[pt]));
-	  }
-	  return drawline;
-	};
-
-    var ctx = canvas.getContext("2d");
-    
-    var features = tileData.contents.features;
-    $.each(features, function(f, feature){
+    $.each(tileData.roads.features, function(f, feature){
       // determine colorset for this line
       var colorset = ["#f00", "#f33", null];
       var highway = feature["properties"]["highway"];
@@ -183,60 +102,23 @@ canvasRoads.drawTile = function(canvas, tilePoint, zoom) {
         // larger highway
         colorset = ["#f00", "#f33", "big"];
       }
-      
+
       var coords = feature.geometry.coordinates;
       for(var pt=1;pt<coords.length;pt++){
-		var firstpt = lltoxy(coords[pt-1]);
-		var nextpt = lltoxy(coords[pt]);
-		drawLine(ctx, firstpt[0], firstpt[1], nextpt[0], nextpt[1], colorset[0], colorset[1], colorset[2]);	    
-	  }
-    });
-  });
-};
-canvasRoads.addTo(map);
-
-var canvasTiles = L.tileLayer.canvas({ minZoom: 15 });
-canvasTiles.drawTile = function(canvas, tilePoint, zoom) {
-  $.getJSON("/tileproxy.php?url="
-   + escape("http://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.json?api_key=vector-tiles-5Vy5RHT"
-      .replace("{z}", zoom)
-      .replace("{x}", tilePoint.x)
-      .replace("{y}", tilePoint.y)
-  ), function(tileData){
-    if(!tileData.contents || !tileData.contents.features || !tileData.contents.features.length){
-      return;
+    var firstpt = lltoxy(coords[pt-1]);
+    var nextpt = lltoxy(coords[pt]);
+    drawLine(ctx, firstpt[0], firstpt[1], nextpt[0], nextpt[1], colorset[0], colorset[1], colorset[2]);
     }
+    });
 
-    var bounds = getTileBounds(tilePoint.x, tilePoint.y, zoom);
-    var south = bounds[0];
-    var west = bounds[1];
-    var north = bounds[2];
-    var east = bounds[3];
-    
-    var lltoxy = function(latlng){
-	  // convert a lat/lng to the canvas's x/y format
-	  var lat = latlng[1];
-	  var lng = latlng[0];
-	  return [ Math.round(256 * (lng - west) / (east - west)), Math.round(256 * (north - lat) / (north - south)) ];
-    };
-    var xyify = function(gpsline){
-	  // convert a whole array of lat/lngs to the canvas's x/y format
-	  var drawline = [];
-	  for(var pt=0;pt<gpsline.length;pt++){
-		drawline.push(lltoxy(gpsline[pt]));
-	  }
-	  return drawline;
-	};
 
-    var ctx = canvas.getContext("2d");
-    
-    var features = tileData.contents.features;
-    $.each(features, function(f, feature){
+    $.each(tileData.buildings.features, function(f, feature){
       drawShape(ctx, xyify( feature.geometry.coordinates[0] ),"#C0C0C0","#C0C0C0");
     });
+
   });
 };
-canvasTiles.addTo(map);
+canvasLand.addTo(map);
 
 
 function getTileBounds(tx,ty,zoom){
@@ -252,7 +134,7 @@ function getTileBounds(tx,ty,zoom){
   var minMeters = pixelsToMeters(tx*256, ty*256, zoom);
   var maxMeters = pixelsToMeters((tx+1)*256, (ty+1)*256, zoom);
   bounds = [minMeters[0], minMeters[1], maxMeters[0], maxMeters[1]];
-  
+
   var metersToLatLng = function(mx, my){
     var lng = (mx / originShift) * 180.0;
     var lat = (my / originShift) * 180.0;
