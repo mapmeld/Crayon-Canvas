@@ -110,6 +110,9 @@ function drawLine(ctx, setx1,sety1,setx2,sety2,lineColor,shadeColor,specialOrder
 function drawShape(ctx, points,lineColor,shadeColor){
 	// draw the standard canvas shape to clear the area which is about to be shaded in
 	var firstpt = points[0];
+        if (!firstpt || !firstpt.length) {
+          return;
+        }
 	ctx.fillStyle = "#ffe";
 	ctx.beginPath();
 	ctx.moveTo(firstpt[0], firstpt[1]);
